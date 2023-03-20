@@ -1,32 +1,44 @@
-import React from 'react'
-import Form from './Form'
-import MovieList from './MovieList'
+import React, { useState, useEffect } from "react";
+import { OMDB_API_KEY } from "../config";
+import MovieList from "./MovieList";
 
-const MovieApi = () => {
-  const [movies, setMovies] = React.useState([]);
+const MovieApi = ({ searchQuery }) => {
+  const [fetchedMovies, setFetchedMovies] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const fetchMovieApi = async () => {
+  const fetchMovies = async () => {
     try {
-      const response = await fetch('"https://www.omdbapi.com/?apikey=baad570d"');
-      const posts = await response.json();
-      console.log(posts);
-      setPosts(posts)
-    } catch(error) {
-      console.log(error)
+      const response = await fetch(
+        `https://www.omdbapi.com/?apikey=${OMDB_API_KEY}&s=${searchQuery}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch movies");
+      }
+      const data = await response.json();
+      console.log(data);
+      setFetchedMovies(data.Search || []);
+    } catch (error) {
+      console.error(error);
+      setErrorMessage("Failed to fetch movies. Please try again later.");
+      setFetchedMovies([]);
     }
-  }
-  React.useEffect(() => {
-    fetchPosts();
-  }, []);
+  };
 
+  useEffect(() => {
+    fetchMovies();
+  }, [searchQuery]);
 
   return (
     <div>
-     <MovieList />
-     <Form />
-      
+      {errorMessage ? (
+        <p>{errorMessage}</p>
+      ) : fetchedMovies.length > 0 ? (
+        <MovieList movies={fetchedMovies} />
+      ) : (
+        <p>No movies found.</p>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default MovieApi
+export default MovieApi;
