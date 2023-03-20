@@ -1,16 +1,20 @@
-import React from 'react'
-import Movie from './Movie'
+import React, { useState, useEffect } from "react";
+import Movie from "./Movie";
 
-const MovieList = () => {
+const MovieList = ({ movies }) => {
   return (
     <div>
-      <Movie />
-      <article>
-        <h2>{search.title}</h2>
-      </article>
+      {movies.map((movie) => (
+        <Movie
+          key={movie.imdbID}
+          title={movie.Title}
+          year={movie.Year}
+          type={movie.Type}
+          poster={movie.Poster}
+        />
+      ))}
     </div>
-    
-  )
-}
+  );
+};
 
-export default MovieList
+export default MovieList;
